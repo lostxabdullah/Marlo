@@ -1,4 +1,4 @@
-    import { useState } from "react";
+  import { useState } from "react";
 import { Sparkles, Calendar, Send, Loader2, RefreshCw, Building2, CheckCircle2, ArrowRight, Zap, Clock, MessageSquare, Video, Lock, Play } from "lucide-react";
 
 const VOICE_PRESETS = [
@@ -203,6 +203,60 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
               <MessageSquare size={20} color="#D9FF3E" />
               <h3 style={styles.featureTitle}>You stay in control</h3>
               <p style={styles.featureText}>Review every post before it goes out. Queue what you like, regenerate what you don't.</p>
+            </div>
+          </section>
+
+          <section style={styles.pricingSection}>
+            <h2 style={styles.pricingTitle}>Simple pricing. No surprises.</h2>
+            <p style={styles.pricingSub}>Start free, upgrade when you're ready.</p>
+            <div style={styles.pricingGrid}>
+
+              {/* Free Plan */}
+              <div style={styles.pricingCard}>
+                <p style={styles.planName}>Starter</p>
+                <p style={styles.planPrice}>₹0<span style={styles.planPer}>/mo</span></p>
+                <p style={styles.planDesc}>Try Marlo with no commitment.</p>
+                <ul style={styles.planFeatures}>
+                  <li style={styles.planFeature}>✓ 7-day content calendar</li>
+                  <li style={styles.planFeature}>✓ Instagram & Facebook captions</li>
+                  <li style={styles.planFeature}>✓ 4 brand voice options</li>
+                  <li style={{ ...styles.planFeature, color: "#4A4F5C" }}>✗ Video generation</li>
+                  <li style={{ ...styles.planFeature, color: "#4A4F5C" }}>✗ Auto-posting</li>
+                </ul>
+                <button style={styles.planBtn} onClick={startApp}>Get started free</button>
+              </div>
+
+              {/* Pro Plan */}
+              <div style={{ ...styles.pricingCard, ...styles.pricingCardPro }}>
+                <div style={styles.popularBadge}>MOST POPULAR</div>
+                <p style={styles.planName}>Pro</p>
+                <p style={{ ...styles.planPrice, color: "#0B0E14" }}>₹2,499<span style={{ ...styles.planPer, color: "#0B0E14" }}>/mo</span></p>
+                <p style={{ ...styles.planDesc, color: "#2A2F3D" }}>Everything a growing business needs.</p>
+                <ul style={styles.planFeatures}>
+                  <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ 7-day content calendar</li>
+                  <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ Instagram & Facebook captions</li>
+                  <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ 4 brand voice options</li>
+                  <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ AI video ad generation</li>
+                  <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ Auto-posting (coming soon)</li>
+                </ul>
+                <button style={{ ...styles.planBtn, ...styles.planBtnPro }} onClick={startApp}>Start Pro free trial</button>
+              </div>
+
+              {/* Agency Plan */}
+              <div style={styles.pricingCard}>
+                <p style={styles.planName}>Agency</p>
+                <p style={styles.planPrice}>₹7,999<span style={styles.planPer}>/mo</span></p>
+                <p style={styles.planDesc}>For agencies managing multiple brands.</p>
+                <ul style={styles.planFeatures}>
+                  <li style={styles.planFeature}>✓ Everything in Pro</li>
+                  <li style={styles.planFeature}>✓ Up to 10 business profiles</li>
+                  <li style={styles.planFeature}>✓ Priority support</li>
+                  <li style={styles.planFeature}>✓ Custom brand voice training</li>
+                  <li style={styles.planFeature}>✓ Dedicated account manager</li>
+                </ul>
+                <button style={styles.planBtn} onClick={startApp}>Contact us</button>
+              </div>
+
             </div>
           </section>
 
@@ -492,6 +546,21 @@ const styles = {
   featureText: { fontSize: 13, color: "#8A8F9C", lineHeight: 1.55, margin: 0 },
 
   ctaBand: { textAlign: "center", padding: "50px 0 70px", borderTop: "1px solid #1E222C" },
+  pricingSection: { padding: "60px 0", borderTop: "1px solid #1E222C" },
+  pricingTitle: { fontSize: 26, fontWeight: 800, textAlign: "center", margin: "0 0 8px" },
+  pricingSub: { fontSize: 14.5, color: "#8A8F9C", textAlign: "center", margin: "0 0 36px" },
+  pricingGrid: { display: "flex", flexDirection: "column", gap: 16 },
+  pricingCard: { background: "#12151D", border: "1px solid #1E222C", borderRadius: 16, padding: "28px 22px", position: "relative" },
+  pricingCardPro: { background: "#D9FF3E", border: "none" },
+  popularBadge: { fontSize: 10, fontWeight: 800, color: "#0B0E14", background: "#0B0E14", color: "#D9FF3E", padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12, letterSpacing: "0.05em" },
+  planName: { fontSize: 13, fontWeight: 700, color: "#8A8F9C", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.05em" },
+  planPrice: { fontSize: 30, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" },
+  planPer: { fontSize: 14, fontWeight: 400 },
+  planDesc: { fontSize: 12.5, color: "#8A8F9C", margin: "0 0 18px", lineHeight: 1.4 },
+  planFeatures: { listStyle: "none", padding: 0, margin: "0 0 22px" },
+  planFeature: { fontSize: 12.5, color: "#C5C8D1", padding: "5px 0", borderBottom: "1px solid #1E222C20" },
+  planBtn: { width: "100%", background: "#1A1E27", border: "1px solid #262B36", borderRadius: 9, padding: "11px", fontSize: 13, fontWeight: 700, color: "#F4F4F2", cursor: "pointer" },
+  planBtnPro: { background: "#0B0E14", border: "none", color: "#D9FF3E" },
   ctaTitle: { fontSize: 24, fontWeight: 800, marginBottom: 20 },
 
   appMain: { position: "relative", zIndex: 2, maxWidth: 640, margin: "0 auto", padding: "20px 24px 60px" },
@@ -543,4 +612,3 @@ const styles = {
   videoPlayer: { width: "100%", borderRadius: 10, marginBottom: 10 },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
-                      
