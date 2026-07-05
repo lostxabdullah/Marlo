@@ -118,7 +118,7 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
       setStep("calendar");
     } catch (e) {
       console.error("Marlo generation error:", e);
-      setError("Error: " + (e.message || "unknown") + " — screenshot this and send it back.");
+      setError("Couldn't generate your calendar right now. Check your connection and try again.");
       setStep("setup");
     }
   }
@@ -406,3 +406,5 @@ const styles = {
   connectedBanner: { display: "flex", alignItems: "center", gap: 8, background: "#12181A", border: "1px solid #2A3A26", borderRadius: 12, padding: "10px 16px", marginBottom: 18, fontSize: 13, color: "#A8C99A" },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
+
+                                     #
