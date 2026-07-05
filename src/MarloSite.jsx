@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Sparkles, Calendar, Send, Loader2, RefreshCw, Building2, CheckCircle2, ArrowRight, Zap, Clock, MessageSquare } from "lucide-react";
+    import { useState } from "react";
+import { Sparkles, Calendar, Send, Loader2, RefreshCw, Building2, CheckCircle2, ArrowRight, Zap, Clock, MessageSquare, Video, Lock, Play } from "lucide-react";
 
 const VOICE_PRESETS = [
   { id: "warm", label: "Warm & Personal" },
@@ -8,14 +8,28 @@ const VOICE_PRESETS = [
   { id: "pro", label: "Polished & Professional" },
 ];
 
+const VIDEO_STYLES = [
+  { id: "cinematic", label: "Cinematic" },
+  { id: "minimal", label: "Clean & Minimal" },
+  { id: "energetic", label: "Energetic & Bold" },
+  { id: "luxury", label: "Luxury & Premium" },
+];
+
 export default function MarloSite() {
   const [view, setView] = useState("landing"); // landing | app
+  const [appTab, setAppTab] = useState("content"); // content | video
   const [step, setStep] = useState("setup"); // setup | generating | calendar
   const [biz, setBiz] = useState({ name: "", type: "", details: "", voice: "warm" });
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
   const [postedIds, setPostedIds] = useState(new Set());
   const [connected, setConnected] = useState(false);
+  const [isPro] = useState(false); // set to true for paying customers
+  const [videoPrompt, setVideoPrompt] = useState("");
+  const [videoStyle, setVideoStyle] = useState("cinematic");
+  const [videoStatus, setVideoStatus] = useState("idle"); // idle | generating | done | error
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [videoError, setVideoError] = useState("");
 
   function connectMeta() {
     // Replace YOUR_APP_ID with the App ID from developers.facebook.com once your app is set up.
@@ -203,7 +217,120 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
 
       {view === "app" && (
         <main style={styles.appMain}>
-          {step === "setup" && (
+          {/* Tab Navigation */}
+          <div style={styles.tabRow}>
+            <button
+              style={{ ...styles.tab, ...(appTab === "content" ? styles.tabActive : {}) }}
+              onClick={() => setAppTab("content")}
+            >
+              <Sparkles size={14} /> Content
+            </button>
+            <button
+              style={{ ...styles.tab, ...(appTab === "video" ? styles.tabActive : {}) }}
+              onClick={() => setAppTab("video")}
+            >
+              <Video size={14} /> Video {!isPro && <span style={styles.proBadge}>PRO</span>}
+            </button>
+          </div>
+
+          {/* Video Generation Tab */}
+          {appTab === "video" && (
+            <div style={styles.setupCard}>
+              {!isPro && (
+                <div style={styles.lockBanner}>
+                  <Lock size={18} color="#D9FF3E" />
+                  <div>
+                    <p style={styles.lockTitle}>Video generation is a Pro feature</p>
+                    <p style={styles.lockSub}>Upgrade to Marlo Pro to generate studio-quality video ads for your clients.</p>
+                  </div>
+                </div>
+              )}
+              <h1 style={{ ...styles.h1, opacity: isPro ? 1 : 0.4 }}>Generate a video ad.</h1>
+              <p style={{ ...styles.subtext, opacity: isPro ? 1 : 0.4 }}>
+                Describe the product or scene. Marlo generates a cinematic clip ready to post.
+              </p>
+
+              <div style={{ ...styles.field, opacity: isPro ? 1 : 0.4 }}>
+                <label style={styles.label}>What's the video about?</label>
+                <textarea
+                  style={{ ...styles.input, minHeight: 90, resize: "vertical" }}
+                  placeholder="e.g. A stylish man wearing premium streetwear walking through a city at golden hour"
+                  value={videoPrompt}
+                  onChange={(e) => isPro && setVideoPrompt(e.target.value)}
+                  disabled={!isPro}
+                />
+              </div>
+
+              <div style={{ ...styles.field, opacity: isPro ? 1 : 0.4 }}>
+                <label style={styles.label}>Visual style</label>
+                <div style={styles.voiceRow}>
+                  {VIDEO_STYLES.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => isPro && setVideoStyle(s.id)}
+                      style={{ ...styles.voiceChip, ...(videoStyle === s.id && isPro ? styles.voiceChipActive : {}) }}
+                      disabled={!isPro}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {videoError && <p style={styles.errorText}>{videoError}</p>}
+
+              {videoStatus === "done" && videoUrl && (
+                <div style={styles.videoResult}>
+                  <video controls style={styles.videoPlayer} src={videoUrl} />
+                  <button style={styles.postBtn} onClick={() => {}}>
+                    <Send size={13} /> Queue for posting
+                  </button>
+                </div>
+              )}
+
+              {videoStatus === "generating" && (
+                <div style={styles.loadingWrap}>
+                  <Loader2 size={24} style={{ animation: "spin 1s linear infinite" }} color="#D9FF3E" />
+                  <p style={styles.loadingText}>Generating your video — this takes 30-60 seconds...</p>
+                </div>
+              )}
+
+              <button
+                style={{ ...styles.primaryBtn, opacity: isPro ? 1 : 0.4 }}
+                disabled={!isPro || videoStatus === "generating"}
+                onClick={async () => {
+                  if (!isPro || !videoPrompt.trim()) return;
+                  setVideoStatus("generating");
+                  setVideoError("");
+                  try {
+                    const res = await fetch("/api/generate-video", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ prompt: videoPrompt, style: videoStyle }),
+                    });
+                    const data = await res.json();
+                    if (data.error) throw new Error(data.error);
+                    if (data.videoUrl) {
+                      setVideoUrl(data.videoUrl);
+                      setVideoStatus("done");
+                    } else {
+                      setVideoStatus("idle");
+                      setVideoError("Video is processing — check back in a minute.");
+                    }
+                  } catch (e) {
+                    setVideoStatus("error");
+                    setVideoError("Couldn't generate video right now. Try again.");
+                  }
+                }}
+              >
+                <Video size={16} />
+                {isPro ? "Generate video" : "Upgrade to generate videos"}
+              </button>
+            </div>
+          )}
+
+          {/* Content Tab */}
+          {appTab === "content" && (
             <div style={styles.setupCard}>
               <h1 style={styles.h1}>Give Marlo the brief.</h1>
               <p style={styles.subtext}>
@@ -333,6 +460,7 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
               </p>
             </div>
           )}
+          )} {/* end content tab */}
         </main>
       )}
 
@@ -404,7 +532,15 @@ const styles = {
   connectBanner: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "#1A1E27", border: "1px solid #262B36", borderRadius: 12, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#C5C8D1" },
   connectBtn: { background: "#D9FF3E", color: "#0B0E14", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" },
   connectedBanner: { display: "flex", alignItems: "center", gap: 8, background: "#12181A", border: "1px solid #2A3A26", borderRadius: 12, padding: "10px 16px", marginBottom: 18, fontSize: 13, color: "#A8C99A" },
+  tabRow: { display: "flex", gap: 8, marginBottom: 20 },
+  tab: { display: "flex", alignItems: "center", gap: 6, background: "#12151D", border: "1px solid #1E222C", borderRadius: 10, padding: "10px 18px", fontSize: 13.5, color: "#8A8F9C", cursor: "pointer", fontWeight: 600 },
+  tabActive: { background: "#D9FF3E", color: "#0B0E14", borderColor: "#D9FF3E" },
+  proBadge: { background: "#2A2F3D", color: "#D9FF3E", fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, letterSpacing: "0.05em", marginLeft: 4 },
+  lockBanner: { display: "flex", alignItems: "flex-start", gap: 12, background: "#1A1E27", border: "1px solid #D9FF3E33", borderRadius: 12, padding: "14px 16px", marginBottom: 20 },
+  lockTitle: { fontSize: 14, fontWeight: 700, margin: "0 0 4px", color: "#F4F4F2" },
+  lockSub: { fontSize: 12.5, color: "#8A8F9C", margin: 0, lineHeight: 1.5 },
+  videoResult: { marginBottom: 16 },
+  videoPlayer: { width: "100%", borderRadius: 10, marginBottom: 10 },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
-
-                                     
+                      
