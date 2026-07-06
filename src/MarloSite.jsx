@@ -1,4 +1,5 @@
-  import { useState } from "react";
+
+    import { useState } from "react";
 import { Sparkles, Calendar, Send, Loader2, RefreshCw, Building2, CheckCircle2, ArrowRight, Zap, Clock, MessageSquare, Video, Lock, Play } from "lucide-react";
 
 const VOICE_PRESETS = [
@@ -24,7 +25,61 @@ export default function MarloSite() {
   const [error, setError] = useState("");
   const [postedIds, setPostedIds] = useState(new Set());
   const [connected, setConnected] = useState(false);
-  const [isPro] = useState(false); // set to true for paying customers
+  const [isPro, setIsPro] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  async function handleUpgrade(plan) {
+    setPaymentLoading(true);
+    try {
+      // Create order on backend
+      const res = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const order = await res.json();
+      if (order.error) throw new Error(order.error);
+
+      // Load Razorpay checkout
+      const options = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Marlo",
+        description: `Marlo ${plan === "agency" ? "Agency" : "Pro"} Plan`,
+        order_id: order.orderId,
+        handler: async function (response) {
+          // Verify payment on backend
+          const verifyRes = await fetch("/api/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            setIsPro(true);
+            setView("app");
+            setAppTab("video");
+          }
+        },
+        prefill: { name: "", email: "", contact: "" },
+        theme: { color: "#D9FF3E" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Payment error:", err);
+      alert("Payment failed. Please try again.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  }
   const [videoPrompt, setVideoPrompt] = useState("");
   const [videoStyle, setVideoStyle] = useState("cinematic");
   const [videoStatus, setVideoStatus] = useState("idle"); // idle | generating | done | error
@@ -239,7 +294,9 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
                   <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ AI video ad generation</li>
                   <li style={{ ...styles.planFeature, color: "#0B0E14" }}>✓ Auto-posting (coming soon)</li>
                 </ul>
-                <button style={{ ...styles.planBtn, ...styles.planBtnPro }} onClick={startApp}>Start Pro free trial</button>
+                <button style={{ ...styles.planBtn, ...styles.planBtnPro }} onClick={() => handleUpgrade("pro")}>
+                  {paymentLoading ? "Processing..." : "Start Pro — ₹2,499/mo"}
+                </button>
               </div>
 
               {/* Agency Plan */}
@@ -254,7 +311,9 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
                   <li style={styles.planFeature}>✓ Custom brand voice training</li>
                   <li style={styles.planFeature}>✓ Dedicated account manager</li>
                 </ul>
-                <button style={styles.planBtn} onClick={startApp}>Contact us</button>
+                <button style={styles.planBtn} onClick={() => handleUpgrade("agency")}>
+                  {paymentLoading ? "Processing..." : "Get Agency — ₹7,999/mo"}
+                </button>
               </div>
 
             </div>
@@ -612,3 +671,4 @@ const styles = {
   videoPlayer: { width: "100%", borderRadius: 10, marginBottom: 10 },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
+                              
