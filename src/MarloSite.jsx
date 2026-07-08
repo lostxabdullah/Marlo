@@ -1,5 +1,4 @@
-
-    import { useState } from "react";
+import { useState } from "react";
 import { Sparkles, Calendar, Send, Loader2, RefreshCw, Building2, CheckCircle2, ArrowRight, Zap, Clock, MessageSquare, Video, Lock, Play } from "lucide-react";
 
 const VOICE_PRESETS = [
@@ -573,7 +572,6 @@ Return ONLY a JSON array of exactly 7 objects, one per day (Monday through Sunda
               </p>
             </div>
           )}
-          )} {/* end content tab */}
         </main>
       )}
 
@@ -671,4 +669,5 @@ const styles = {
   videoPlayer: { width: "100%", borderRadius: 10, marginBottom: 10 },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
-                              
+
+                                            
