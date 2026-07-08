@@ -609,7 +609,7 @@ const styles = {
   pricingGrid: { display: "flex", flexDirection: "column", gap: 16 },
   pricingCard: { background: "#12151D", border: "1px solid #1E222C", borderRadius: 16, padding: "28px 22px", position: "relative" },
   pricingCardPro: { background: "#D9FF3E", border: "none" },
-  popularBadge: { fontSize: 10, fontWeight: 800, color: "#0B0E14", background: "#0B0E14", color: "#D9FF3E", padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12, letterSpacing: "0.05em" },
+  popularBadge: { fontSize: 10, fontWeight: 800, background: "#0B0E14", color: "#D9FF3E", padding: "3px 8px", borderRadius: 4, display: "inline-block", marginBottom: 12, letterSpacing: "0.05em" },
   planName: { fontSize: 13, fontWeight: 700, color: "#8A8F9C", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.05em" },
   planPrice: { fontSize: 30, fontWeight: 800, margin: "0 0 6px", letterSpacing: "-0.02em" },
   planPer: { fontSize: 14, fontWeight: 400 },
@@ -670,4 +670,4 @@ const styles = {
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
 
-                                            
+  
