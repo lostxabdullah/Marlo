@@ -74,7 +74,7 @@ export default function MarloSite() {
       rzp.open();
     } catch (err) {
       console.error("Payment error:", err);
-      alert("Payment failed. Please try again.");
+      alert("Payment error: " + (err.message || "Unknown error"));
     } finally {
       setPaymentLoading(false);
     }
@@ -669,5 +669,3 @@ const styles = {
   videoPlayer: { width: "100%", borderRadius: 10, marginBottom: 10 },
   footer: { textAlign: "center", fontSize: 12, color: "#4A4F5C", padding: "20px 0 30px", position: "relative", zIndex: 2 },
 };
-
-  
